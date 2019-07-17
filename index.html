@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <!-- production version, optimized for size and speed -->
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    
+</head>
+<body>
+    <div>
+        <p>
+        Wellcome, this my first app white Vue !!!<br/>
+        because of limited time, I studied within 2 hours to implement it.<br/> 
+        so apologize if it's very basic...  
+    </div>
+
+    <form
+        id="dateValidation"
+        @submit="checkForm">
+        <p >
+            <b>Date Validation:</b>
+        </p>
+        <p>
+            <label for="date">Date (dd/mm/yyyy)</label>
+            <input
+                id="date"
+                v-model="date"
+                type="text"
+                name="date"
+            >
+            <p>{{ notif }}</p>
+        </p>
+        <p>
+            <input
+                type="submit"
+                value="Submit Date"
+            >
+        </p>
+    </form>
+    <br/>
+    <br/>
+    <form 
+        id='currencyConversion'
+        @submit="conversion"
+    >
+        <P>
+            <b>currency conversion :</b>
+        </P>
+        <label for="amount">Amount</label>
+        <input
+            id="amount"
+            v-model="amount"
+            name="amount"
+            type="number"
+            min="0"
+        >
+        <select v-model="selected">
+            <option v-for="option in options" v-bind:value="option.value">
+                {{ option.text }}
+            </option>
+        </select>
+        <span>{{ selected }} to IDR</span>
+        <p>{{ converterResult }}</p>
+        <p>
+            <input
+                type="submit"
+                value="Conver"
+            >
+        </p>
+    </form>
+
+    <script>
+        const dateValidation = new Vue({
+            el: '#dateValidation',
+            data: {
+                notif: null,
+                date: null,
+                
+            },
+            methods:{
+                checkForm: function (e) {
+                    var reg = /(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d/;
+                    if (this.date && this.date.match(reg)) {
+                        this.notif = 'Date format true.';
+                    }
+                    if (!this.date || !this.date.match(reg)) {
+                        this.notif = 'Please enter dd/mm/yyyy.';
+                    }
+                    e.preventDefault()
+                }
+            }
+        })
+
+        const currencyConversion = new Vue({
+            el: '#currencyConversion',
+            data: {
+                selected: 'USD',
+                options: [
+                    { text: 'USD', value: 'USD' },
+                    { text: 'EUR', value: 'EUR' },
+                    { text: 'BTC', value: 'BTC' }
+                ],
+                amount: null,
+                converterResult : null
+            },
+            methods:{
+                conversion: function (e) {
+                    
+                    if(this.amount && this.amount != null) {
+                        //run
+                        const apiKey = '34a40c356531ed8322ec';
+
+                        fromCurrency = encodeURIComponent(this.selected);
+                        toCurrency = encodeURIComponent("IDR");
+                        const query = fromCurrency + '_' + toCurrency;
+
+                        const url = 'https://free.currconv.com/api/v7/convert?q='
+                                    + query + '&compact=ultra&apiKey=' + apiKey;
+                        axios
+                            .get(url)
+                            .then(response => (this.converterResult = response.data[query]*this.amount))
+                         
+                    }
+                    e.preventDefault()
+                }
+            }
+        })
+
+    </script>
+</body>
+</html>
